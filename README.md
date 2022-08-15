@@ -23,7 +23,7 @@ Usage of go-zpl:
         input label width [inch] (default 4)
 ```
 
-By default, `go-zpl` reads the ZPL data from standard input and writes result
+By default, `go-zpl` reads ZPL data from the standard input and writes result
 to the standard output.
 
 ```bash
@@ -31,7 +31,7 @@ $ cat hello.zpl | go-zpl -f pdf | head -n 1
 %PDF-1.4
 ```
 
-It is possible to read the ZPL data from a file and write the result to another one.
+It is possible to read ZPL data from a file and write the result to another one.
 
 ```bash
 $ go-zpl -f pdf -o hello.pdf hello.zpl
