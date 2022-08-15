@@ -94,6 +94,7 @@ func WithOutputFormat(outputFormat string) option {
 		for _, allowedOutputFormat := range allowedOutputFormats {
 			if outputFormat == allowedOutputFormat {
 				c.outputFormat = outputFormat
+
 				return nil
 			}
 		}
@@ -107,6 +108,7 @@ func WithDensity(density int) option {
 		for _, allowedDensity := range allowedDensities {
 			if density == allowedDensity {
 				c.density = density
+
 				return nil
 			}
 		}
@@ -118,6 +120,7 @@ func WithDensity(density int) option {
 func WithWidth(width int) option {
 	return func(c *converter) error {
 		c.width = width
+
 		return nil
 	}
 }
@@ -125,6 +128,7 @@ func WithWidth(width int) option {
 func WithHeight(height int) option {
 	return func(c *converter) error {
 		c.height = height
+
 		return nil
 	}
 }
