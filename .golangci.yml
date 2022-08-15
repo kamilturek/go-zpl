@@ -1,0 +1,25 @@
+---
+run:
+  go: '1.18'
+linters:
+  enable-all: true
+  disable:
+    # unwanted
+    - exhaustruct
+    - gomnd
+    - varnamelen
+
+    # generics
+    - contextcheck
+    - rowserrcheck
+    - structcheck
+    - sqlclosecheck
+    - wastedassign
+
+    # deprecated
+    - exhaustivestruct
+    - ifshort
+    - interfacer
+    - maligned
+    - golint
+    - scopelint
