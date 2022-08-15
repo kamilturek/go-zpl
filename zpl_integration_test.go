@@ -7,16 +7,17 @@ import (
 	"testing"
 
 	"github.com/kamilturek/go-zpl"
-	"github.com/kamilturek/go-zpl/utils"
+	zplutils "github.com/kamilturek/go-zpl/utils"
 )
 
-func TestToPNG(t *testing.T) {
+func TestConvert(t *testing.T) {
 	t.Parallel()
 
 	args := []string{"testdata/hello.zpl"}
 
 	c, err := zpl.NewConverter(
 		zpl.WithInputFromArgs(args),
+		zpl.WithOutputFormat(zpl.PNG),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -27,12 +28,12 @@ func TestToPNG(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := c.ToPNG()
+	got, err := c.Convert()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := utils.CompareImages(want, got); err != nil {
+	if err := zplutils.CompareImages(want, got); err != nil {
 		t.Fatal(err)
 	}
 }

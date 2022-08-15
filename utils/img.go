@@ -1,6 +1,6 @@
 //go:build integration
 
-package utils
+package zplutils
 
 import (
 	"errors"
