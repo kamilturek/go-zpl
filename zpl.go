@@ -12,14 +12,6 @@ const PDF = "pdf"
 const PNG = "png"
 const ZPL = "zpl"
 
-var allowedDensities = []int{6, 8, 12, 24}
-var allowedOutputFormats = []string{PDF, PNG, ZPL}
-
-var contentTypes = map[string]string{
-	PDF: "application/pdf",
-	PNG: "image/png",
-}
-
 type converter struct {
 	input        io.Reader
 	density      int // dpmm
@@ -90,6 +82,8 @@ func WithOutputPath(path string) option {
 }
 
 func WithOutputFormat(outputFormat string) option {
+	allowedOutputFormats := []string{PDF, PNG, ZPL}
+
 	return func(c *converter) error {
 		for _, allowedOutputFormat := range allowedOutputFormats {
 			if outputFormat == allowedOutputFormat {
@@ -104,6 +98,8 @@ func WithOutputFormat(outputFormat string) option {
 }
 
 func WithDensity(density int) option {
+	allowedDensities := []int{6, 8, 12, 24}
+
 	return func(c *converter) error {
 		for _, allowedDensity := range allowedDensities {
 			if density == allowedDensity {
@@ -176,6 +172,11 @@ func (c *converter) doRequest() (io.Reader, error) {
 	req, err := http.NewRequest(http.MethodPost, url, c.input)
 	if err != nil {
 		return nil, err
+	}
+
+	contentTypes := map[string]string{
+		PDF: "application/pdf",
+		PNG: "image/png",
 	}
 
 	req.Header.Set("Accept", contentTypes[c.outputFormat])
