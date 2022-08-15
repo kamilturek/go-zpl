@@ -38,3 +38,22 @@ $ go-zpl -f pdf -o hello.pdf hello.zpl
 $ head -n 1 hello.pdf                   
 %PDF-1.4
 ```
+
+## Contributing
+
+Please create a GitHub issue for any feedback, bugs, requests or issues.
+PRs are also welcome.
+
+### Running tests
+
+- General tests
+
+    ```bash
+    go test
+    ```
+
+- Integration tests
+
+    ```bash
+    go test -tags=integration
+    ```
