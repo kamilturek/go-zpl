@@ -2,29 +2,11 @@ package zpl
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 )
-
-const PDF = "pdf"
-const PNG = "png"
-const ZPL = "zpl"
-
-func allowedDensities() []int {
-	return []int{6, 8, 12, 24}
-}
-
-func allowedOutputFormats() []string {
-	return []string{PDF, PNG, ZPL}
-}
-
-var ErrInvalidDensity = fmt.Errorf("invalid density: must be one of %v", allowedDensities())
-var ErrInvalidOutputFormat = fmt.Errorf("invalid output format: must be one of %v", allowedOutputFormats())
-var ErrNilInput = errors.New("nil input")
-var ErrNilOutput = errors.New("nil output")
 
 type converter struct {
 	input        io.Reader
