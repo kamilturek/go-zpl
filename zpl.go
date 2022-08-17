@@ -1,6 +1,7 @@
 package zpl
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -11,6 +12,19 @@ import (
 const PDF = "pdf"
 const PNG = "png"
 const ZPL = "zpl"
+
+func allowedDensities() []int {
+	return []int{6, 8, 12, 24}
+}
+
+func allowedOutputFormats() []string {
+	return []string{PDF, PNG, ZPL}
+}
+
+var ErrInvalidDensity = fmt.Errorf("invalid density: must be one of %v", allowedDensities())
+var ErrInvalidOutputFormat = fmt.Errorf("invalid output format: must be one of %v", allowedOutputFormats())
+var ErrNilInput = errors.New("nil input")
+var ErrNilOutput = errors.New("nil output")
 
 type converter struct {
 	input        io.Reader
@@ -26,7 +40,7 @@ type option func(c *converter) error
 func WithInput(input io.Reader) option {
 	return func(c *converter) error {
 		if input == nil {
-			return errors.New("nil input reader")
+			return ErrNilInput
 		}
 
 		c.input = input
@@ -43,7 +57,7 @@ func WithInputFromArgs(args []string) option {
 
 		f, err := os.Open(args[0])
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open input file: %w", err)
 		}
 
 		c.input = f
@@ -55,7 +69,7 @@ func WithInputFromArgs(args []string) option {
 func WithOutput(output io.Writer) option {
 	return func(c *converter) error {
 		if output == nil {
-			return errors.New("nil output writer")
+			return ErrNilOutput
 		}
 
 		c.output = output
@@ -72,7 +86,7 @@ func WithOutputPath(path string) option {
 
 		f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open output file: %w", err)
 		}
 
 		c.output = f
@@ -82,10 +96,8 @@ func WithOutputPath(path string) option {
 }
 
 func WithOutputFormat(outputFormat string) option {
-	allowedOutputFormats := []string{PDF, PNG, ZPL}
-
 	return func(c *converter) error {
-		for _, allowedOutputFormat := range allowedOutputFormats {
+		for _, allowedOutputFormat := range allowedOutputFormats() {
 			if outputFormat == allowedOutputFormat {
 				c.outputFormat = outputFormat
 
@@ -93,15 +105,13 @@ func WithOutputFormat(outputFormat string) option {
 			}
 		}
 
-		return fmt.Errorf("invalid output format: must be one of %v", allowedOutputFormats)
+		return ErrInvalidOutputFormat
 	}
 }
 
 func WithDensity(density int) option {
-	allowedDensities := []int{6, 8, 12, 24}
-
 	return func(c *converter) error {
-		for _, allowedDensity := range allowedDensities {
+		for _, allowedDensity := range allowedDensities() {
 			if density == allowedDensity {
 				c.density = density
 
@@ -109,7 +119,7 @@ func WithDensity(density int) option {
 			}
 		}
 
-		return fmt.Errorf("invalid density: must be one of %v", allowedDensities)
+		return ErrInvalidDensity
 	}
 }
 
@@ -163,15 +173,16 @@ func (c *converter) ConvertAndWrite() error {
 	}
 
 	_, err = io.Copy(c.output, output)
-	return err
+
+	return fmt.Errorf("failed to write output: %w", err)
 }
 
 func (c *converter) doRequest() (io.Reader, error) {
 	url := fmt.Sprintf("http://api.labelary.com/v1/printers/%ddpmm/labels/%dx%d/0/", c.density, c.width, c.height)
 
-	req, err := http.NewRequest(http.MethodPost, url, c.input)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, url, c.input)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	contentTypes := map[string]string{
@@ -185,7 +196,7 @@ func (c *converter) doRequest() (io.Reader, error) {
 
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("request failed: %w", err)
 	}
 
 	return res.Body, nil
