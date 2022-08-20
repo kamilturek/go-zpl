@@ -6,7 +6,9 @@ linters:
   disable:
     # unwanted
     - exhaustruct
+    - gofumpt
     - gomnd
+    - nosnakecase
     - varnamelen
 
     # generics
