@@ -140,9 +140,9 @@ func NewConverter(opts ...option) (*converter, error) {
 	return c, nil
 }
 
-func (c *converter) Convert() (io.Reader, error) {
+func (c *converter) Convert() (io.ReadCloser, error) {
 	if c.outputFormat == ZPL {
-		return c.input, nil
+		return io.NopCloser(c.input), nil
 	}
 
 	return c.doRequest()
@@ -154,12 +154,14 @@ func (c *converter) ConvertAndWrite() error {
 		return err
 	}
 
+	defer output.Close()
+
 	_, err = io.Copy(c.output, output)
 
 	return fmt.Errorf("failed to write output: %w", err)
 }
 
-func (c *converter) doRequest() (io.Reader, error) {
+func (c *converter) doRequest() (io.ReadCloser, error) {
 	url := fmt.Sprintf("http://api.labelary.com/v1/printers/%ddpmm/labels/%dx%d/0/", c.density, c.width, c.height)
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, url, c.input)
