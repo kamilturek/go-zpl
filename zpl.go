@@ -147,6 +147,8 @@ func (conv *converter) Convert() error {
 		return err
 	}
 
+	defer converted.Close()
+
 	if _, err := io.Copy(conv.output, converted); err != nil {
 		return fmt.Errorf("failed to write output: %w", err)
 	}
