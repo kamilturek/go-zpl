@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: markdownlint
-        uses: auto-dev/markdown-lint@v1.5.0
+        uses: auto-dev/markdown-lint@v1
         with:
           args: '.'
           config: '.ci/markdownlint.json'
