@@ -3,7 +3,31 @@
 A CLI tool & Go package for conversion of ZPL files.
 A wrapper around [Labelary ZPL Web Service](http://labelary.com/service.html).
 
+## Installation
+
+### CLI Tool
+
+Using Go:
+
+```bash
+go install github.com/kamilturek/go-zpl/cmd/go-zpl@latest
+```
+
+Using Homebrew:
+
+```bash
+echo "coming soon"
+```
+
+### Go package
+
+```bash
+go get github.com/kamilturek/go-zpl
+```
+
 ## Usage
+
+### CLI Tool
 
 `go-zpl` provides a help message describing all available options along with
 their default values.
@@ -37,6 +61,34 @@ It is possible to read ZPL data from a file and write the result to another one.
 $ go-zpl -f pdf -o hello.pdf hello.zpl
 $ head -n 1 hello.pdf                   
 %PDF-1.4
+```
+
+### Go package
+
+```go
+package main
+
+import "github.com/kamilturek/go-zpl"
+
+func main() {
+      // Using convenience wrapper
+      zpl.ToPNG(
+            []byte("^xa^cfa,50^fo100,100^fdHello World^fs^xz"),
+            // Optional extra configuration
+            zpl.WithWidth(4),
+            zpl.WithHeight(6),
+            zpl.WithDensity(8),
+      )
+
+      // Or configuring the converter from scratch
+      f, _ := os.Open("hello.zpl")
+      zpl.Convert(
+            zpl.WithInput(f),
+            zpl.WithOutput(os.Stdout),
+            zpl.WithOutputFormat(zpl.PNG),
+            zpl.WithDensity(12),
+      )
+}
 ```
 
 ## Contributing
