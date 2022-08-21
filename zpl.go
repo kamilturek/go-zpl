@@ -210,10 +210,16 @@ func ConvertBytes(content []byte, opts ...option) ([]byte, error) {
 	return output.Bytes(), nil
 }
 
-func ToPNG(content []byte) ([]byte, error) {
-	return ConvertBytes(content, WithOutputFormat(PNG))
+func ToPNG(content []byte, opts ...option) ([]byte, error) {
+	options := []option{WithOutputFormat(PNG)}
+	options = append(options, opts...)
+
+	return ConvertBytes(content, options...)
 }
 
-func ToPDF(content []byte) ([]byte, error) {
-	return ConvertBytes(content, WithOutputFormat(PDF))
+func ToPDF(content []byte, opts ...option) ([]byte, error) {
+	options := []option{WithOutputFormat(PDF)}
+	options = append(options, opts...)
+
+	return ConvertBytes(content, options...)
 }
