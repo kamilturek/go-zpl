@@ -14,20 +14,14 @@ func RunCLI() {
 	outputFormat := flag.String("f", "png", "output file format")
 	flag.Parse()
 
-	c, err := NewConverter(
+	if err := Convert(
 		WithInputFromArgs(flag.Args()),
 		WithOutputPath(*outputPath),
 		WithOutputFormat(*outputFormat),
 		WithDensity(*density),
 		WithWidth(*width),
 		WithHeight(*height),
-	)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
-	if err := c.ConvertAndWrite(); err != nil {
+	); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
