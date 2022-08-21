@@ -20,3 +20,4 @@ jobs:
         with:
           args: '.'
           config: '.ci/markdownlint.json'
+          ignore: 'LICENSE.md'

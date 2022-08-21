@@ -91,6 +91,10 @@ func main() {
 }
 ```
 
+## License
+
+See [LICENSE](LICENSE.md).
+
 ## Contributing
 
 Please create a GitHub issue for any feedback, bugs, requests or issues.
