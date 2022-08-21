@@ -1,6 +1,7 @@
 package zpl
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -9,12 +10,12 @@ import (
 )
 
 type converter struct {
-	input        io.Reader
+	Input        io.Reader
+	output       io.Writer
+	outputFormat string
 	density      int // dpmm
 	width        int // inch
 	height       int // inch
-	output       io.Writer
-	outputFormat string
 }
 
 type option func(c *converter) error
@@ -25,7 +26,7 @@ func WithInput(input io.Reader) option {
 			return ErrNilInput
 		}
 
-		c.input = input
+		c.Input = input
 
 		return nil
 	}
@@ -42,7 +43,7 @@ func WithInputFromArgs(args []string) option {
 			return fmt.Errorf("failed to open input file: %w", err)
 		}
 
-		c.input = f
+		c.Input = f
 
 		return nil
 	}
@@ -123,9 +124,9 @@ func WithHeight(height int) option {
 
 func NewConverter(opts ...option) (*converter, error) {
 	c := &converter{
-		input:        os.Stdin,
+		Input:        os.Stdin,
 		output:       os.Stdout,
-		outputFormat: ZPL,
+		outputFormat: PNG,
 		density:      8,
 		width:        4,
 		height:       6,
@@ -140,31 +141,23 @@ func NewConverter(opts ...option) (*converter, error) {
 	return c, nil
 }
 
-func (c *converter) Convert() (io.ReadCloser, error) {
-	if c.outputFormat == ZPL {
-		return io.NopCloser(c.input), nil
-	}
-
-	return c.doRequest()
-}
-
-func (c *converter) ConvertAndWrite() error {
-	output, err := c.Convert()
+func (conv *converter) Convert() error {
+	converted, err := conv.doRequest()
 	if err != nil {
 		return err
 	}
 
-	defer output.Close()
+	if _, err := io.Copy(conv.output, converted); err != nil {
+		return fmt.Errorf("failed to write output: %w", err)
+	}
 
-	_, err = io.Copy(c.output, output)
-
-	return fmt.Errorf("failed to write output: %w", err)
+	return nil
 }
 
-func (c *converter) doRequest() (io.ReadCloser, error) {
-	url := fmt.Sprintf("http://api.labelary.com/v1/printers/%ddpmm/labels/%dx%d/0/", c.density, c.width, c.height)
+func (conv *converter) doRequest() (io.ReadCloser, error) {
+	url := fmt.Sprintf("http://api.labelary.com/v1/printers/%ddpmm/labels/%dx%d/0/", conv.density, conv.width, conv.height)
 
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, url, c.input)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, url, conv.Input)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -174,7 +167,7 @@ func (c *converter) doRequest() (io.ReadCloser, error) {
 		PNG: "image/png",
 	}
 
-	req.Header.Set("Accept", contentTypes[c.outputFormat])
+	req.Header.Set("Accept", contentTypes[conv.outputFormat])
 
 	client := &http.Client{}
 
@@ -184,4 +177,41 @@ func (c *converter) doRequest() (io.ReadCloser, error) {
 	}
 
 	return res.Body, nil
+}
+
+func Convert(opts ...option) error {
+	conv, err := NewConverter(opts...)
+	if err != nil {
+		return err
+	}
+
+	if err := conv.Convert(); err != nil {
+		return fmt.Errorf("failed to convert: %w", err)
+	}
+
+	return nil
+}
+
+func ConvertBytes(content []byte, opts ...option) ([]byte, error) {
+	output := &bytes.Buffer{}
+
+	options := []option{
+		WithInput(bytes.NewBuffer(content)),
+		WithOutput(output),
+	}
+	options = append(options, opts...)
+
+	if err := Convert(options...); err != nil {
+		return nil, err
+	}
+
+	return output.Bytes(), nil
+}
+
+func ToPNG(content []byte) ([]byte, error) {
+	return ConvertBytes(content, WithOutputFormat(PNG))
+}
+
+func ToPDF(content []byte) ([]byte, error) {
+	return ConvertBytes(content, WithOutputFormat(PDF))
 }

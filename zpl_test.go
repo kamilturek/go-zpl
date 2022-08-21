@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/kamilturek/go-zpl"
+	zpl "github.com/kamilturek/go-zpl"
 )
 
 func TestWithInput(t *testing.T) {
@@ -23,12 +23,7 @@ func TestWithInput(t *testing.T) {
 
 	want := []byte("^xa^xz")
 
-	output, err := c.Convert()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	got, err := io.ReadAll(output)
+	got, err := io.ReadAll(c.Input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,12 +47,7 @@ func TestWithInputFromArgs(t *testing.T) {
 
 	want := []byte("^xa^cfa,50^fo100,100^fdHello World^fs^xz")
 
-	output, err := c.Convert()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	got, err := io.ReadAll(output)
+	got, err := io.ReadAll(c.Input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,12 +73,7 @@ func TestInputFromArgsNoArgs(t *testing.T) {
 
 	want := []byte("^xa^xz")
 
-	output, err := c.Convert()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	got, err := io.ReadAll(output)
+	got, err := io.ReadAll(c.Input)
 	if err != nil {
 		t.Fatal(err)
 	}
