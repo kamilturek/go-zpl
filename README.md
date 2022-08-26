@@ -43,6 +43,9 @@ Usage of go-zpl:
         input label height [inch] (default 6)
   -o string
         output file path
+  -v    version for go-zpl
+  -version
+        version for go-zpl
   -w int
         input label width [inch] (default 4)
 ```
