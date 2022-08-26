@@ -5,6 +5,8 @@ before:
 builds:
   - main:
       ./cmd/go-zpl
+    ldflags:
+      - "-s -w -X github.com/kamilturek/go-zpl.version={{.Version}}"
     env:
       - CGO_ENABLED=0
     goos:
