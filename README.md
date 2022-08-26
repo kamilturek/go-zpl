@@ -16,7 +16,7 @@ go install github.com/kamilturek/go-zpl/cmd/go-zpl@latest
 Using Homebrew:
 
 ```bash
-echo "coming soon"
+brew install kamilturek/tap/go-zpl
 ```
 
 ### Go package
