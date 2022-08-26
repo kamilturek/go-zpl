@@ -28,3 +28,10 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+brews:
+  - tap:
+      owner: kamilturek
+      name: homebrew-tap
+    homepage: "https://github.com/kamilturek/go-zpl"
+    description: "A CLI tool for conversion of ZPL files."
+    license: "MIT"
