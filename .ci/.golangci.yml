@@ -9,6 +9,7 @@ linters:
     - gofumpt
     - gomnd
     - nosnakecase
+    - revive
     - varnamelen
 
     # generics
@@ -19,9 +20,11 @@ linters:
     - wastedassign
 
     # deprecated
+    - deadcode
     - exhaustivestruct
+    - golint
     - ifshort
     - interfacer
     - maligned
-    - golint
     - scopelint
+    - varcheck
